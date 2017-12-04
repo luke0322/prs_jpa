@@ -1,12 +1,16 @@
 package ui;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import business.Product;
 import business.PurchaseRequest;
 import business.PurchaseRequestDB;
 import business.PurchaseRequestLineItem;
+import business.Status;
+import business.StatusDB;
 import business.User;
 import business.UserDB;
 import business.Vendor;
@@ -15,13 +19,20 @@ import db.ProductDB;
 import util.Console;
 
 public class PRSApp {
-	public static void main(String[] args) {
+	private static HashMap<Integer, Status>statusMap;
+	private static User validatedUser = null;
+	public static void main(String[] args) { 
+		initializeStatusMap();
 		System.out.println("Welcome to PRS JPA!\n");
 		String choice = "";
+		initialDisplay();
 		while (!choice.equalsIgnoreCase("exit")) {
+			if(choice.equalsIgnoreCase("")) {
+				choice = Console.getString("Option?:  ");
+				login();
+			}
 			displayMenu();
 			choice = Console.getString("Option?:  ");
-			
 			if (choice.equalsIgnoreCase("getuser")) {
 				getUserById();
 			}else if (choice.equalsIgnoreCase("all")) {
@@ -40,8 +51,19 @@ public class PRSApp {
 				deleteUser();
 			}else if (choice.equalsIgnoreCase("update")) {
 				updateUser();
+			}else if (choice.equalsIgnoreCase("status")) {
+				//getAllStatus();
+				
+				getPR();
 			}else if (choice.equalsIgnoreCase("newpr")) { //sequence table error, ask S for help
 				addPurchaseRequest();
+			}else if (choice.equalsIgnoreCase("logout")) { //sequence table error, ask S for help
+				logout();
+				initialDisplay();
+				choice = Console.getString("Option?:  ");
+				if(choice.equalsIgnoreCase("exit")) {
+					break;
+				}
 			}else {
 				if (!choice.equalsIgnoreCase("exit")) {
 				System.out.println("Input not accepted. Please provide valid choice.");
@@ -50,6 +72,23 @@ public class PRSApp {
 		}
 
 
+	}
+	private static void initializeStatusMap() {
+		statusMap = new HashMap<>();
+		ArrayList<Status> statusID = StatusDB.getAllStatuses();
+		for (Status s: statusID) {
+			statusMap.put(s.getId(), s);
+		}
+		System.out.println();
+	}
+		
+	public static void initialDisplay() {
+		
+		System.out.println("\nMenu:");
+		System.out.println("=====================");
+		System.out.println("login - User Login");
+		System.out.println("exit - Exit application");
+		System.out.println();
 	}
 	private static void deleteUser() {
 		int userId = Console.getInt("Enter userID to delete: ");
@@ -79,11 +118,40 @@ public class PRSApp {
 		System.out.println("getpurch - get a purchaserequest by ID");
 		System.out.println("getprod - get a product by ID");
 		System.out.println("getallprod - get all products");
+		System.out.println("status - get all status options");
 		System.out.println("del  - Delete a User");
 		System.out.println("update  - update a username");
 		System.out.println("exit - Exit application");
+		System.out.println("logout - log out of application");
 		System.out.println();
 	}
+	public static void login() {
+		System.out.println("User Login");
+	while(true) {
+		String userName = Console.getString("userName:  ");//
+		String password= Console.getString("password:  ");//
+		validatedUser = UserDB.authenticateUser(userName, password);
+		if (validatedUser!=null) {
+			System.out.println("Success:  user logged in.");
+			System.out.println(validatedUser);
+			break;
+		} else {
+			System.out.println("Login failure:  no user for given userName & pwd combo.");
+			}
+		}
+	}
+	public static void logout() {
+		String uString = validatedUser.getUserName();
+		validatedUser = null;
+		if(uString != null) {
+			System.out.println("User '"+uString+"' logged out.");
+			uString = null;
+		}
+//		}else {
+//			System.out.println("User '"+uString+"' could not log out");
+//		}
+	}
+
 	private static void addUser() {
 		System.out.println("\nWe are going to be adding users.");
 		String userName = Console.getString("Enter uname: ");
@@ -110,7 +178,8 @@ public class PRSApp {
 		int statusID = Console.getInt("Enter StatusID: ");
 		double total = Console.getDouble("Enter total: ");
 		//ArrayList<PurchaseRequestLineItem> prLineItems;
-		PurchaseRequest p = new PurchaseRequest(description, justification, deliveryMode, statusID, total);
+		Status s = statusMap.get(statusID);
+		PurchaseRequest p = new PurchaseRequest(description, justification, deliveryMode, s, total);
 		p.setSubmittedDate(new Timestamp(System.currentTimeMillis()));
 		p.setDateNeeded(new Timestamp(System.currentTimeMillis()));
 		User u = (UserDB.getUserById(userId));
@@ -123,7 +192,12 @@ public class PRSApp {
 		}
 		System.out.println();
 	}
-
+	private static void getPR() {
+		int prID = Console.getInt("Enter id of pr to retrieve: ");
+		PurchaseRequest pr = PurchaseRequestDB.getPurchaseRequestById(prID);
+//		String desc = statusMap.get(pr.getStatus());
+//		System.out.println("PR: " + pr + " status desc = "+desc);
+	}
 	private static void getUserById() {
 		int userID = Console.getInt("\nEnter userID to retrieve: ");
 		User u = UserDB.getUserById(userID);
@@ -152,6 +226,13 @@ public class PRSApp {
 		System.out.println("\nAll users: ");
 		for (User u : users) {
 			System.out.println(u);
+		}
+	}
+	private static void getAllStatus() {
+		ArrayList<Status> status = StatusDB.getAllStatuses();
+		System.out.println("\nAll users: ");
+		for (Status s : status) {
+			System.out.println(s);
 		}
 	}
 	private static void getAllProducts() {

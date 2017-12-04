@@ -1,6 +1,10 @@
 package business;
 
+import java.util.ArrayList;
+
 import javax.persistence.EntityManager;
+
+import javax.persistence.TypedQuery;
 
 import db.DBUtil;
 
@@ -15,4 +19,17 @@ public class StatusDB {
 			em.close();
 		}
 	}
+	public static ArrayList<Status> getAllStatuses(){ //gets them by id, description
+		EntityManager em = DBUtil.getEmFactory().createEntityManager();
+		try {
+			TypedQuery<Status> query = em.createQuery("SELECT s FROM Status s",Status.class); //JPQL
+			ArrayList<Status> allStatuses = new ArrayList<>(query.getResultList());
+			return allStatuses;
+		}finally{ //no exception present, close the connection after finishing
+			em.close();
+		}
+	}
+
+
+	
 }

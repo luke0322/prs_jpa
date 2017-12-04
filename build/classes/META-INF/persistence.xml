@@ -7,6 +7,7 @@
 		<class>business.PurchaseRequest</class>
 		<class>business.Product</class>
 		<class>business.PurchaseRequestLineItem</class>
+		<class>business.Status</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 		<properties>
           <property name="javax.persistence.jdbc.url" 

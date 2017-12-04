@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import db.DBUtil;
@@ -78,13 +77,14 @@ public class UserDB {
 		return success;
 	}
 	public static User authenticateUser(String userName,String password) {
-		User usr = null;
+		
 		EntityManager em = DBUtil.getEmFactory().createEntityManager();
-		String jpql = "Select u from User u where u.userName = :uname and u.password = :pwd"; 
+		String jpql = "Select u from User u where u.userName = :uname"; 
 		//parameterized queries needed for less risk of SQL injection attacks, uname is the ? like in JDBC
 		TypedQuery<User> q = em.createQuery(jpql,User.class);
 		q.setParameter("uname", userName);
-		q.setParameter("pwd", password);
+		//q.setParameter("pwd", password);
+		User usr = null;
 		try {
 		usr = q.getSingleResult();
 		}
@@ -106,15 +106,16 @@ public class UserDB {
 			em.close();
 		}
 	}
-	public static User getUserById2(int user) {
-		EntityManager em = DBUtil.getEmFactory().createEntityManager();
-		try {
-			User u = em.find(User.class, user);
-			return u;
-		}finally{ //no exception present, close the connection after finishing
-			em.close();
-		}
-	}
+//	public static User getUserByUsername(String userName) { //use a typed query
+//		EntityManager em = DBUtil.getEmFactory().createEntityManager();
+//		try {
+//			User user = em.(User.class, userName);
+//			return user;
+//		}finally{ //no exception present, close the connection after finishing
+//			em.close();
+//		}
+//	}
+
 	
 
 

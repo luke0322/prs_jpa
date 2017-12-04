@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 
@@ -37,7 +36,9 @@ public class PurchaseRequest implements Serializable {
 	//////
 	private Timestamp dateNeeded;
 	private String deliveryMode;
-	private int statusID;
+	@ManyToOne
+	@JoinColumn(name="statusID")
+	private Status status;
 	private double total;
 	private Timestamp submittedDate;
 	private boolean isActive;
@@ -52,7 +53,7 @@ public class PurchaseRequest implements Serializable {
 	public PurchaseRequest() {
 		id = 0;
 		description = "";
-		statusID = 1;
+		status = null;
 		total = 0.0;
 		submittedDate = null;
 		prLineItems = new ArrayList<>();
@@ -62,7 +63,7 @@ public class PurchaseRequest implements Serializable {
 		isActive = true;
 	}
 
-	public PurchaseRequest(int id,User userID,String description, String justification, String deliveryMode, int statusID,
+	public PurchaseRequest(int id,User userID,String description, String justification, String deliveryMode, Status status,
 			double total) { 
 		super();
 		this.id = id;
@@ -70,16 +71,16 @@ public class PurchaseRequest implements Serializable {
 		this.description = description;
 		this.justification = justification;
 		this.deliveryMode = deliveryMode;
-		this.statusID = statusID;
+		this.status = status;
 		this.total = total;
 		prLineItems = new ArrayList<PurchaseRequestLineItem>();
 	}
-	public PurchaseRequest(String description, String justification, String deliveryMode, int statusID,
+	public PurchaseRequest(String description, String justification, String deliveryMode, Status status,
 			double total) { 
 		setDescription(description);
 		setJustification(justification);
 		setDeliveryMode(deliveryMode);
-		setStatus(statusID);
+		setStatus(status);
 		setTotal(total);
 	}
 	
@@ -130,12 +131,12 @@ public class PurchaseRequest implements Serializable {
 		this.deliveryMode = deliveryMode;
 	}
 
-	public int getStatus() {
-		return statusID;
+	public Status getStatus() {
+		return status;
 	}
 
-	public void setStatus(int status) {
-		this.statusID = status;
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
 	public double getTotal() {
@@ -179,7 +180,7 @@ public class PurchaseRequest implements Serializable {
 	public String toString() {
 		return "\nUser: id = " + id + ", userID=" + userID + ", description = " + description + ", justification = "
 				+ justification + ", " + "dateNeeded = " + dateNeeded + ", deliveryMode = " + deliveryMode
-				+ ", Status =" + statusID + "," + "total= " + total + ", submittedDate = " + submittedDate
+				+ ", Status =" + status + "," + "total= " + total + ", submittedDate = " + submittedDate
 				+ "\n, prLineItems=" + prLineItems + "]";
 
 	}
