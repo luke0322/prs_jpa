@@ -8,14 +8,21 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class PurchaseRequestLineItem implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private int quantity;
 	@Id
-	//@GeneratedValue(strategy = GenerationType.AUTO)
+	//GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
+	
+	//may need to join a column here somehow
+	//private PurchaseRequest purchaseRequest;
+	@ManyToOne
+	@JoinColumn(name = "PurchaseRequestID")
 	private int purchaserequestID;
 	private int productID;
 
@@ -27,13 +34,18 @@ public class PurchaseRequestLineItem implements Serializable {
 	}
 
 	public PurchaseRequestLineItem(int quantity, int id, int purchaserequestID, int productID) {
-		super();
 		this.quantity = quantity;
 		this.id = id;
 		this.purchaserequestID = purchaserequestID;
 		this.productID = productID;
 	}
-
+//	public PurchaseRequest getPurchaseRequest() {
+//		return purchaseRequest;
+//	}
+//
+//	public void setPurchaseRequest(PurchaseRequest purchaseRequest) {
+//		this.purchaseRequest = purchaseRequest;
+//	}
 	public int getQuantity() {
 		return quantity;
 	}

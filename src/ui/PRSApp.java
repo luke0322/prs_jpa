@@ -27,49 +27,60 @@ public class PRSApp {
 		String choice = "";
 		initialDisplay();
 		while (!choice.equalsIgnoreCase("exit")) {
-			if(choice.equalsIgnoreCase("")) {
+			if (choice.equalsIgnoreCase("")) {
 				choice = Console.getString("Option?:  ");
 				login();
 			}
 			displayMenu();
 			choice = Console.getString("Option?:  ");
-			if (choice.equalsIgnoreCase("getuser")) {
+
+			switch (choice) {
+			case "getuser":
 				getUserById();
-			}else if (choice.equalsIgnoreCase("all")) {
+				break;
+			case "all":
 				getAllUsers();
-			}else if (choice.equalsIgnoreCase("add")) {
+				break;
+			case "add":
 				addUser();
-			}else if (choice.equalsIgnoreCase("getvendor")) {
+				break;
+			case "getvendor":
 				getVendorById();
-			}else if (choice.equalsIgnoreCase("getpurch")) {
+				break;
+			case "getpurch":
 				getPurchById();
-			}else if (choice.equalsIgnoreCase("getprod")) {
+				break;
+			case "getprod":
 				getProdById();
-			}else if (choice.equalsIgnoreCase("getallprod")) {
+				break;
+			case "getallprod":
 				getAllProducts();
-			}else if (choice.equalsIgnoreCase("del")) {
+				break;
+			case "del":
 				deleteUser();
-			}else if (choice.equalsIgnoreCase("update")) {
+				break;
+			case "update":
 				updateUser();
-			}else if (choice.equalsIgnoreCase("status")) {
-				//getAllStatus();
-				
-				getPR();
-			}else if (choice.equalsIgnoreCase("newpr")) { //sequence table error, ask S for help
+				break;
+			case "status":
+				getAllStatus();
+				//getPR();
+				break;
+			case "newpr": // sequence table error, ask S for help
 				addPurchaseRequest();
-			}else if (choice.equalsIgnoreCase("logout")) { //sequence table error, ask S for help
+				break;
+			case "logout": 
 				logout();
 				initialDisplay();
 				choice = Console.getString("Option?:  ");
-				if(choice.equalsIgnoreCase("exit")) {
-					break;
-				}
-			}else {
-				if (!choice.equalsIgnoreCase("exit")) {
-				System.out.println("Input not accepted. Please provide valid choice.");
+				while (true) {
+					if (choice.equalsIgnoreCase("exit")) {
+						break;
+					}
 				}
 			}
 		}
+		
 
 
 	}
@@ -183,14 +194,26 @@ public class PRSApp {
 		p.setSubmittedDate(new Timestamp(System.currentTimeMillis()));
 		p.setDateNeeded(new Timestamp(System.currentTimeMillis()));
 		User u = (UserDB.getUserById(userId));
-		p.setUserID(u); //implement a login feature
+		p.setUserID(u);
 		p.isActive();
+		addPRLI();
 		p.getPrLineItems();
-		p.setUpdatedByUser(u);;
+		p.setUpdatedByUser(u);
 		if (PurchaseRequestDB.addPurchaseRequest(p)) {
 			System.out.println("Purchase Request " + p.getUserID() + "successfully added");
 		}
 		System.out.println();
+	}
+	private static void addPRLI() {
+		System.out.println("\n Please enter line items.");
+		int quantity = Console.getInt("Enter quantity: ");
+		int pID = Console.getInt("Enter product ID: ");
+		PurchaseRequestLineItem prli = new PurchaseRequestLineItem();
+		prli.setQuantity(quantity);
+		prli.setProductID(pID);
+		//prli.setPurchaserequestID(pID);
+		
+		
 	}
 	private static void getPR() {
 		int prID = Console.getInt("Enter id of pr to retrieve: ");
